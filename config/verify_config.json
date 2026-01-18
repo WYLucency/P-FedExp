@@ -1,0 +1,31 @@
+{
+    "root": "/Users/ycw/Documents/ycAir/WYC/other/work4/code/FedBook-base",
+    "num_experts": 1,
+    "_comment_pretrain": "Verification config",
+    "pretrain_num_clients": [
+        1
+    ],
+    "_comment_finetune": "Verification finetune",
+    "finetune_num_clients": [
+        1
+    ],
+    "_comment_tasks": "Tasks",
+    "tasks": [
+        "graph_cls"
+    ],
+    "_comment_datasets": "Datasets",
+    "datasets": [
+        "chempcba"
+    ],
+    "_comment_weights": "Weights",
+    "weights": [
+        1
+    ],
+    "_comment_finetune_datasets": "Finetune datasets",
+    "finetune_datasets": [
+        "chemhiv"
+    ],
+    "finetune_tasks": [
+        "graph_cls"
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "root": "/Users/ycw/Documents/ycAir/WYC/other/work4/code/FedBook-base",
+    "num_experts": 2,
+    "_comment_pretrain": "【预训练配置】3个客户端分别使用Cora、Citeseer、Pubmed数据集进行跨域联邦预训练",
+    "pretrain_num_clients": [
+        1,
+        1
+    ],
+    "_comment_finetune": "【微调配置】在Arxiv数据集上进行多客户端微调，划分为5个客户端",
+    "finetune_num_clients": [
+        1
+    ],
+    "_comment_tasks": "【任务说明】预训练和微调都是节点分类任务",
+    "tasks": [
+        "node_cls",
+        "node_cls"
+    ],
+    "_comment_datasets": "【预训练数据集】Cora(client0)、Citeseer(client1)、Pubmed(client2)",
+    "datasets": [
+        "citeseer",
+        "pubmed"
+    ],
+    "_comment_weights": "【权重说明】预训练时各数据集权重相等",
+    "weights": [
+        1,
+        1
+    ],
+    "_comment_finetune_datasets": "【微调数据集】Arxiv大规模单一图数据，划分为3个客户端进行联邦微调",
+    "finetune_datasets": [
+        "cora"
+    ],
+    "finetune_tasks": [
+        "node_cls"
+    ]
+}

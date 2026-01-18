@@ -1,0 +1,187 @@
+node:
+  cora:
+    finetune_dataset: cora
+    normalize: none
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.001
+    lambda_proto: 1
+    lambda_act: 0.1
+    trade_off: 0.1
+    num_instances_per_class: 0
+    n_train: 1
+  # 【新增配置】添加Citeseer数据集的微调超参数
+  # 参数参考Cora设置，因为它们都是引文网络，具有相似的特性
+  # 【修复】将训练轮数从100增加到1000，早停从20增加到200，与Cora保持一致
+  # 原因：100轮训练太少，导致模型过早收敛到100%准确率（可能是局部最优或过拟合）
+  citeseer:
+    finetune_dataset: citeseer
+    normalize: none
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.001
+    lambda_proto: 1
+    lambda_act: 0.1
+    trade_off: 0.1
+    num_instances_per_class: 0
+    n_train: 1
+  # 【新增配置】添加Photo数据集的微调超参数
+  # Amazon Photo是产品共购买网络，参数参考Cora设置
+  photo:
+    finetune_dataset: photo
+    normalize: none
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.001
+    lambda_proto: 1
+    lambda_act: 0.1
+    trade_off: 0.1
+    num_instances_per_class: 0
+    n_train: 1
+  # 【新增配置】添加Computers数据集的微调超参数
+  # Amazon Computers是产品共购买网络，参数参考Cora设置
+  computers:
+    finetune_dataset: computers
+    normalize: none
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.001
+    lambda_proto: 1
+    lambda_act: 0.1
+    trade_off: 0.1
+    num_instances_per_class: 0
+    n_train: 1
+  pubmed:
+    finetune_dataset: pubmed
+    normalize: none
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.001
+    lambda_proto: 0.1
+    lambda_act: 1
+    trade_off: 0.5
+    num_instances_per_class: 0
+  arxiv:
+    finetune_dataset: arxiv
+    normalize: none
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.0005
+    lambda_proto: 1
+    lambda_act: 0.1
+    trade_off: 0.01
+    num_instances_per_class: 0
+    n_train: 5
+  wikics:
+    finetune_dataset: wikics
+    normalize: none
+    finetune_epochs: 2000
+    early_stop: 500
+    batch_size: 0
+    finetune_lr: 0.0001
+    lambda_proto: 1
+    lambda_act: 1
+    trade_off: 0.01
+    num_instances_per_class: 0
+  # 【新增配置】添加Reddit数据集的微调超参数
+  # Reddit是社交网络数据集，有41个类别，参数参考Cora设置
+  reddit:
+    finetune_dataset: reddit
+    normalize: none
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.001
+    lambda_proto: 1
+    lambda_act: 0.1
+    trade_off: 0.1
+    num_instances_per_class: 0
+    n_train: 1
+link:
+  WN18RR:
+    finetune_dataset: WN18RR
+    normalize: batch
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.001
+    lambda_proto: 0.1
+    lambda_act: 1
+    trade_off: 0.7
+    num_instances_per_class: 0
+    n_train: 1
+  FB15K237:
+    finetune_dataset: FB15K237
+    normalize: batch
+    finetune_epochs: 3000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.0005
+    lambda_proto: 0.1
+    lambda_act: 0.1
+    trade_off: 0.9
+    num_instances_per_class: 50
+    n_train: 30
+graph:
+  chemhiv:
+    finetune_dataset: chemhiv
+    normalize: batch
+    finetune_epochs: 100
+    early_stop: 20
+    batch_size: 1024
+    finetune_lr: 0.0003
+    lambda_proto: 0.1
+    lambda_act: 1
+    trade_off: 0.8
+    num_instances_per_class: 1500
+    n_train: 20
+  chempcba:
+    finetune_dataset: chempcba
+    normalize: batch
+    finetune_epochs: 50
+    early_stop: 10
+    batch_size: 1024
+    finetune_lr: 0.001
+    lambda_proto: 1
+    lambda_act: 1
+    trade_off: 0.5
+    num_instances_per_class: 20
+    n_train: 20
+  # 【新增配置】添加 PROTEINS 和 IMDB-BINARY 数据集的微调超参数
+  # 参数参考 chemhiv 设置，因为它们都是图分类任务
+  proteins:
+    finetune_dataset: proteins
+    normalize: batch
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 128
+    finetune_lr: 0.001
+    lambda_proto: 0.1
+    lambda_act: 1
+    trade_off: 0.8
+    num_instances_per_class: 50
+    n_train: 10
+  # 【修复】IMDB-BINARY 是小数据集（~1000图），需要特殊配置
+  # 问题：VQ和prototype在小数据集上容易崩溃，原因：
+  # 1. num_instances_per_class太大（50），原型采样过多
+  # 2. lambda_proto太小（0.1），prototype学习不足
+  # 3. trade_off太大（0.8），过度依赖线性分类器
+  # 解决方案：减小原型采样，增加prototype权重，平衡两种分类器
+  imdb-binary:
+    finetune_dataset: imdb-binary
+    normalize: batch
+    finetune_epochs: 200
+    early_stop: 50
+    batch_size: 64
+    finetune_lr: 0.001
+    lambda_proto: 0.5        # 增加 prototype 损失权重（从0.1到0.5）
+    lambda_act: 0.5          # 平衡线性分类器损失权重（从1到0.5）
+    trade_off: 0.3           # 降低线性分类器预测权重（从0.8到0.3），70%用prototype
+    num_instances_per_class: 15  # 减少原型采样（从50到15），避免过拟合
+    n_train: 10

@@ -1,0 +1,40 @@
+# System files
+.DS_Store
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints
+
+# Logs and Outputs
+logs/
+results/
+*.log
+
+# Model Checkpoints
+ckpts/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Data and Cache
+cache_data/
+partitions/
+archive/
+ofa/cache_data/
+
+# Specific Data Files (that might be mixed in folders)
+*.pkl
+*.bin
+# keeping .json as it is used for config

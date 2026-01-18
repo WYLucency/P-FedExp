@@ -1,0 +1,46 @@
+{
+    "root": "/home/zhuangzy25/FGLFGM/FedBook",
+    "_comment_pretrain": "【预训练配置】5个数据集组合: cora, pubmed, computers, wikics, photo",
+    "pretrain_num_clients": [
+        1,
+        1,
+        1,
+        1,
+        1
+    ],
+    "_comment_finetune": "【微调配置】在citeseer数据集上进行微调（未参与预训练的数据集）",
+    "finetune_num_clients": [
+        1
+    ],
+    "_comment_tasks": "【任务说明】预训练和微调都是节点分类任务",
+    "tasks": [
+        "node_cls",
+        "node_cls",
+        "node_cls",
+        "node_cls",
+        "node_cls"
+    ],
+    "_comment_datasets": "【预训练数据集】cora, pubmed, computers, wikics, photo",
+    "datasets": [
+        "cora",
+        "pubmed",
+        "computers",
+        "wikics",
+        "photo"
+    ],
+    "_comment_weights": "【权重说明】预训练时各数据集权重相等",
+    "weights": [
+        1,
+        1,
+        1,
+        1,
+        1
+    ],
+    "_comment_finetune_datasets": "【微调数据集】citeseer（未参与预训练的数据集）",
+    "finetune_datasets": [
+        "citeseer"
+    ],
+    "finetune_tasks": [
+        "node_cls"
+    ]
+}
