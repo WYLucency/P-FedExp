@@ -11,6 +11,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--gpu_id", type=int, default=0)
     parser.add_argument("--seed", type=int, default=2025)
+    parser.add_argument("--project_path", type=str, default=osp.join(osp.dirname(__file__)))
     parser.add_argument("--data_config", type=str, default=osp.join(osp.dirname(__file__), "config", "pretrain_config.json"))
     parser.add_argument("--partition_root", type=str, default=osp.join(osp.dirname(__file__), "partitions"))
     R1 = 20

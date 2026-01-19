@@ -1,8 +1,11 @@
 {
-    "root": "/Users/ycw/Documents/ycAir/WYC/other/work4/code/FedBook-base",
-    "num_experts": 2,
+    "root": "/home/weiyc/P-FedExp/P-FedExp",
+    "num_experts": 5,
     "_comment_pretrain": "【预训练配置】3个客户端分别使用Cora、Citeseer、Pubmed数据集进行跨域联邦预训练",
     "pretrain_num_clients": [
+        1,
+        1,
+        1,
         1,
         1
     ],
@@ -13,15 +16,24 @@
     "_comment_tasks": "【任务说明】预训练和微调都是节点分类任务",
     "tasks": [
         "node_cls",
+        "node_cls",
+        "node_cls",
+        "node_cls",
         "node_cls"
     ],
     "_comment_datasets": "【预训练数据集】Cora(client0)、Citeseer(client1)、Pubmed(client2)",
     "datasets": [
         "citeseer",
-        "pubmed"
+        "pubmed",
+        "photo",
+        "computers",
+        "wikics"
     ],
     "_comment_weights": "【权重说明】预训练时各数据集权重相等",
     "weights": [
+        1,
+        1,
+        1,
         1,
         1
     ],

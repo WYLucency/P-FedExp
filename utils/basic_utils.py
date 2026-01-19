@@ -412,7 +412,7 @@ def load_pretrain_mydataset_ofa(args, mode="pretrain"):
         dataset_list = []
         split_list = []
 
-        tasks = get_task_constructor('/Users/ycw/Documents/ycAir/WYC/other/work4/code/FedBook-base/cache_data')
+        tasks = get_task_constructor(osp.join(args.project_path, "cache_data"))
         
         for dataset_name in datasets:
             # 【修改点3】在节点分类数据集列表中添加citeseer、photo、computers、reddit，支持这些数据集的加载
