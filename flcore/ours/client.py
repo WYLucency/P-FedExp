@@ -138,6 +138,8 @@ class Client:
         self.query_node_code_first=False
         
         self.max_batch = 20
+        # GFT: Track expert usage
+        self.expert_usage = None
         
     
     # def get_local_cluster_size(self):
@@ -198,6 +200,12 @@ class Client:
                     z, quantize, indices, losses = self.pretrain_model(
                         aug_graph, graph, self.topo_recon_ratio, bs=batch_data.batch_size, no_codebook=False
                     )
+                    
+                    # GFT: Accumulate expert usage
+                    if self.expert_usage is None:
+                        self.expert_usage = indices.detach() # indices here is actually mean_gate_weights now
+                    else:
+                        self.expert_usage += indices.detach()
 
                     feat_recon_loss = self.feat_lambda * losses['feat_recon_loss']
                     topo_recon_loss = self.topo_lambda * losses['topo_recon_loss']
@@ -246,7 +254,13 @@ class Client:
                     'avg_losses/sem_recon_loss': avg_sem_recon_loss,
                     'avg_losses/commit_loss': avg_commit_loss,
                     'avg_losses/loss': avg_loss,
+                    'avg_losses/loss': avg_loss,
                 })    
+            
+            # GFT: Normalize expert usage
+            if self.expert_usage is not None:
+                self.expert_usage = self.expert_usage / (all_batch_count + 1e-8)
+                print(f"[client {self.client_id}] Expert Usage: {self.expert_usage}")
             
 
         time_end = time.time()
@@ -400,16 +414,22 @@ class Client:
     def get_pretrain_model(self):
         local_message = {
             "num_samples": 1,
-            "weight": list(self.pretrain_model.named_parameters())
+            # GFT: Only return expert parameters
+            "weight": [(name, param) for name, param in self.pretrain_model.named_parameters() if "moe_encoder.experts" in name],
+            # GFT: Send expert usage
+            "expert_usage": self.expert_usage.cpu() if self.expert_usage is not None else None
         }
 
         return local_message
     # 客户端在接收全局模型时，显式地跳过了码本 (codebook) 的覆盖。
     # 这意味着码本的更新遵循一套独立的逻辑（在 Server 端处理），或者客户端希望保留本地学到的离散特征分布。
     def set_pretrain_model(self, global_message): 
+        # GFT: Only update expert parameters
+        global_params = dict(global_message)
         with torch.no_grad():
-            for (local_name, local_param), (_, global_param) in zip(self.pretrain_model.named_parameters(), global_message):
-                local_param.data.copy_(global_param.data)
+            for local_name, local_param in self.pretrain_model.named_parameters():
+                if local_name in global_params:
+                    local_param.data.copy_(global_params[local_name].data)
 
 
 

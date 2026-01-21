@@ -170,5 +170,7 @@ class PretrainModel(nn.Module):
 
         # Return format consistent with original: z, quantize, indices, losses
         # converting "quantize" and "indices" to None or dummy values since VQ is gone
-        return z, z, None, losses
+        # GFT: returning mean_gate_weights to track expert usage
+        mean_gate_weights = gate_weights.mean(dim=0).squeeze(0) # [num_experts]
+        return z, z, mean_gate_weights, losses
 

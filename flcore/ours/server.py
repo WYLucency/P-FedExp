@@ -97,16 +97,78 @@ class Server:
                 weight = 1.0 / num_clients
                 local_named_weights = dict(local_message_dict[client_id]['weight'])
                 for name, global_param in self.global_model.named_parameters():
-                    local_param = local_named_weights[name]
-                    if it == 0:
-                        global_param.data.copy_(weight * local_param.data)
-                    else:
-                        global_param.data += weight * local_param.data
+                    if name in local_named_weights:
+                        local_param = local_named_weights[name]
+                        if it == 0:
+                            global_param.data.copy_(weight * local_param.data)
+                        else:
+                            global_param.data += weight * local_param.data
 
+        # GFT: Personalized Aggregation based on Gating
+        
+        # 1. Collect expert usage vectors
+        expert_usages = []
+        for client_id in range(num_clients):
+             if 'expert_usage' in local_message_dict[f'client_{client_id}'] and local_message_dict[f'client_{client_id}']['expert_usage'] is not None:
+                 expert_usages.append(local_message_dict[f'client_{client_id}']['expert_usage'].to(self.device).float())
+             else:
+                 # Fallback if no usage info is present (e.g. first round or error)
+                 expert_usages.append(torch.ones(self.num_experts, device=self.device) / self.num_experts)
+        
+        U = torch.stack(expert_usages) # [num_clients, num_experts]
+        
+        # 2. Compute Similarity Matrix
+        # Normalize rows
+        U_norm = F.normalize(U, p=2, dim=1)
+        S = torch.matmul(U_norm, U_norm.T) # [num_clients, num_clients]
+        
+        print("Similarity Matrix:\n", S)
+        
+        # 3. Personalized Aggregation
         self.personalized_glb_model_list = []
-        global_message = self.get_global_message()
-        for _ in range(num_clients):
-            self.personalized_glb_model_list.append(copy.deepcopy(global_message))
+        
+        for i in range(num_clients):
+            # Calculate aggregation weights for client i
+            # Use softmax or simple normalization over the similarity row
+            # Here we use Softmax scaled by a temperature alpha to control sharpness
+            # Alpha can be a hyperparameter. Let's start with 1.0 or higher to emphasize similarity.
+            alpha = 5.0 
+            agg_weights = F.softmax(S[i] * alpha, dim=0) 
+            
+            # Construct personalized global model for client i
+            # It is a weighted sum of all clients' uploaded parameters
+            
+            personalized_params = {}
+            for name, param in self.global_model.named_parameters():
+                if "moe_encoder.experts" in name: # Only aggregate experts
+                     personalized_params[name] = torch.zeros_like(param)
+            
+            for j in range(num_clients):
+                w_ij = agg_weights[j]
+                local_named_weights = dict(local_message_dict[f'client_{j}']['weight'])
+                
+                for name in personalized_params:
+                    if name in local_named_weights:
+                        personalized_params[name] += w_ij * local_named_weights[name].data.to(self.device)
+            
+            # Create a model state dict structure to return
+            # We need to return a list of (name, param) tuples as expected by client
+            personalized_message = []
+            for name, param in self.global_model.named_parameters():
+                if name in personalized_params:
+                    # Create a new parameter/tensor for the message
+                    new_param = nn.Parameter(personalized_params[name])
+                    personalized_message.append((name, new_param))
+                else:
+                    # For non-expert params, we don't update them via FL in this scheme, 
+                    # but we should probably simply consistent with whatever the global model has 
+                    # (which is not updated!) or just omit them.
+                    # As per client logic: "Only update expert parameters".
+                    # So sending them or not doesn't matter if client checks existence.
+                    # But let's verify if client needs them.
+                    pass
+            
+            self.personalized_glb_model_list.append(personalized_message)
 
         
         # gfm
@@ -191,6 +253,7 @@ class Server:
             self.personalized_glb_model_list.append(copy.deepcopy(global_message))
 
     def get_global_message(self):
-        global_message = list(self.global_model.named_parameters())
+        # GFT: Only return expert parameters
+        global_message = [(name, param) for name, param in self.global_model.named_parameters() if "moe_encoder.experts" in name]
         return global_message
         
